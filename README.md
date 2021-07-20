@@ -6,7 +6,7 @@ This repository contains code and data for our paper:
 
 ## Note
 
-* Files ``studyX_parameters.py` produce the parameter settings for our experiments. Each of these files generates a csv setup files in data/.
+* Files `studyX_parameters.py` produce the parameter settings for our experiments. Each of these files generates a csv setup files in data/.
 * The R-script `submitter.R` runs the algorithms adopting the R-package [batchtools](https://github.com/mllg/batchtools) for massive parallelization of runs. This script should work fine locally (if not HPC is available), but execution may take some time due to 100k+ runs.
 * File `collect.R` collects the raw algorithm run data.
 * File `analyze.R` eventually generates the plots.
