@@ -5,3 +5,4 @@ python3 study2_parameters.py
 python3 study3_parameters.py
 python3 study4_parameters.py
 python3 study5_parameters.py
+python3 study6_parameters.py

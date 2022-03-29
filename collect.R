@@ -26,5 +26,5 @@ import_data = function(output_dir) {
 }
 
 studies = list.dirs("data/raw", recursive = FALSE)
-
+studies = "data/raw/study6"
 lapply(studies, import_data)

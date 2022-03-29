@@ -36,5 +36,7 @@ def termrnd(target, f, S):
   return fn
 
 # explicitly place targets
-def termexplicit(targets, f):
-  pass
+def termexplicit(targets):
+  def fn(x):
+    return (x in targets)
+  return fn

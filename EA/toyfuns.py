@@ -100,3 +100,29 @@ def SPI():
 # Ridge is an alias for SPI
 def RIDGE():
   return SPI()
+
+# Plateau
+def PLATEAU():
+  def fn(x):
+    n = len(x)
+    s = sum(x)
+
+    # Case 1
+    if s == n:
+      return n + 2
+
+    # Case 2
+    u = 0
+    for i in range(n):
+      if x[i] == 0:
+        break
+      else:
+        u += 1
+    # first s bits are 1, others are necessarily 0
+    if s == u:
+      return n + 1 # we are on the plateau
+
+    # Case 3
+    return n - s
+
+  return fn

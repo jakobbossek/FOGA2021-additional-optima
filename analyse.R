@@ -2,6 +2,8 @@ library(tidyverse)
 library(ggplot2)
 library(purrr)
 library(tibble)
+library(scales)
+library(latex2exp)
 
 # STUDY 1 - (1+1) EA in HAMMING BALL setting on OneMax and LeadingOnes
 # ===
@@ -16,9 +18,9 @@ g = g + geom_boxplot()
 g = g + theme_bw()
 g = g + labs(x = "Hamming-ball radius", y = "Nr. of function evaluations")
 g = g + scale_x_discrete(breaks = seq(10, 500, by = 20))
-g = g + facet_wrap(f ~ ., nrow = 1L, scales = "free_y")
+g = g + facet_wrap(. ~ f, nrow = 2L, scales = "free_y")
 g
-ggsave("images/hamming_ball_onemax_lo_n500.pdf", plot = g, width = 16, height = 3.5)
+ggsave("images/hamming_ball_onemax_lo_n500.pdf", plot = g, width = 8, height = 6)
 
 
 
@@ -72,7 +74,7 @@ g = g + labs(
   color = latex2exp::TeX("#Bits $n$"))
 g = g + scale_color_grey(start = 0.2, end = 0.5)
 g
-ggsave("images/hamming_ball_1commaLambda_onemax_r10_20_30_nAll.pdf", plot = g, width = 14, height = 3.5)
+ggsave("images/hamming_ball_1commaLambda_onemax_r10_20_30_nAll.pdf", plot = g, width = 11, height = 3.5)
 
 
 # STUDY 4 - (1+1) EA in FITNESS-LEVEL setting on OneMax and LeadingOnes
@@ -113,3 +115,48 @@ g = g + scale_x_discrete(breaks = br, labels = parse(text = latex2exp::TeX(sprin
 #g = g + facet_wrap(n ~ ., nrow = 1L, scales = "free")
 g
 ggsave("images/random_placement_onemax_n250.pdf", plot = g, width = 8, height = 3.5)
+
+
+# STUDY 6 - (1+1) EA on PLATEAU with angelic placement
+# ===
+tbl = readr::read_delim("data/study6_results.csv", delim = " ")
+# why the hell is there a trailing dot in the name?!
+colnames(tbl)[colnames(tbl) == "function."] = "f"
+
+tblaggr = tbl %>%
+  group_by(f, n, ntargets) %>%
+  dplyr::summarise(evals.mean = mean(evals), evals.sd = sd(evals)) %>%
+  ungroup()
+
+tbl.ridge = filter(tblaggr, f == "RIDGE")
+g = ggplot(tbl.ridge, aes(x = as.factor(n), y = evals.mean, group = as.factor(ntargets), shape = as.factor(ntargets), color = as.factor(ntargets)))
+g = g + geom_line()
+g = g + geom_point()
+g = g + geom_errorbar(aes(ymin = evals.mean - evals.sd, ymax = evals.mean + evals.sd), width = 0.1)#, position = position_dodge(1))
+g = g + theme_bw()
+g = g + labs(x = expression(n), y = "Nr. of function evaluations", shape = "Additional targets", color = "Additional targets")
+g = g + theme(legend.position = "top")
+lbs = unname(TeX(c("$S = \\{\\}", "$S = \\{s_1\\}")))
+g = g + scale_shape_discrete(labels = lbs)
+g = g + scale_color_brewer(palette = "Dark2", labels = lbs)
+br = seq(10, 100, by = 10)
+g = g + scale_x_discrete(breaks = br, labels = br)
+g
+ggsave("images/angelic_placement_ridge.pdf", plot = g, width = 8, height = 3.5)
+
+
+tbl.plateau = filter(tblaggr, f == "PLATEAU")#, n <=30)
+g = ggplot(tbl.plateau, aes(x = as.factor(n), y = evals.mean, group = as.factor(ntargets), shape = as.factor(ntargets), color = as.factor(ntargets)))
+g = g + geom_line()
+g = g + geom_point()
+g = g + geom_errorbar(aes(ymin = evals.mean - evals.sd, ymax = evals.mean + evals.sd), width = 0.1)#, position = position_dodge(1))
+g = g + theme_bw()
+g = g + labs(x = expression(n), y = "Nr. of function evaluations", shape = "Additional targets", color = "Additional targets")
+g = g + theme(legend.position = "top")
+lbs = unname(TeX(c("$S = \\{\\}", "$S = \\{s_1\\}", "$S = \\{s_1, s_2\\}")))
+g = g + scale_color_brewer(palette = "Dark2", labels = lbs)
+g = g + scale_shape_discrete(labels = lbs)
+br = seq(10, 100, by = 10)
+g = g + scale_x_discrete(breaks = br, labels = br)
+g
+ggsave("images/angelic_placement_plateau.pdf", plot = g, width = 8, height = 3.5)
