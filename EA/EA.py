@@ -8,6 +8,10 @@ def EA(lam, n, f, term, mut, strategy = "plus", maxevals = float('inf')):
   while not term(x) and fevals < maxevals:
     # list of lists
     O = [mut(x) for _ in range(lam)]
+    # >> fix
+    if any(map(term, O)):
+      break
+    # << fix
     fO = list(map(f, O))
     Obestidx = fO.index(max(fO))
     if strategy == "comma":

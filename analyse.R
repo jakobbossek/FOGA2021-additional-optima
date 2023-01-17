@@ -34,7 +34,8 @@ g = ggplot(tbl, aes(x = as.factor(radius), y = evals))
 #g = g + geom_boxplot(aes(color = f))
 g = g + geom_boxplot()
 g = g + theme_bw()
-g = g + labs(x = "Hamming-ball radius", y = "Function evaluations")
+g = g + scale_y_log10()
+g = g + labs(x = "Hamming-ball radius", y = "Function evaluations (log-scaled)")
 #g = g + theme(legend.position = "top")
 #g = g + scale_color_brewer(palette = "Dark2")
 g = g + facet_wrap(.~k, scales = "free", labeller = label_both)
@@ -127,9 +128,11 @@ tblaggr = tbl %>%
   group_by(f, n, ntargets) %>%
   dplyr::summarise(evals.mean = mean(evals), evals.sd = sd(evals)) %>%
   ungroup()
+tblaggr$ntargets = factor(tblaggr$ntargets, levels = sort(unique(tblaggr$ntargets)))
+
 
 tbl.ridge = filter(tblaggr, f == "RIDGE")
-g = ggplot(tbl.ridge, aes(x = as.factor(n), y = evals.mean, group = as.factor(ntargets), shape = as.factor(ntargets), color = as.factor(ntargets)))
+g = ggplot(tbl.ridge, aes(x = as.factor(n), y = evals.mean, group = ntargets, shape = ntargets, color = ntargets))
 g = g + geom_line()
 g = g + geom_point()
 g = g + geom_errorbar(aes(ymin = evals.mean - evals.sd, ymax = evals.mean + evals.sd), width = 0.1)#, position = position_dodge(1))
@@ -147,7 +150,7 @@ ggsave("images/angelic_placement_ridge.pdf", plot = g, width = 8, height = 3.5)
 
 
 tbl.plateau = filter(tblaggr, f == "PLATEAU")
-g = ggplot(tbl.plateau, aes(x = as.factor(n), y = evals.mean, group = as.factor(ntargets), shape = as.factor(ntargets), color = as.factor(ntargets)))
+g = ggplot(tbl.plateau, aes(x = as.factor(n), y = evals.mean, group = ntargets, shape = ntargets, color = ntargets))
 g = g + geom_line()
 g = g + geom_point()
 g = g + geom_errorbar(aes(ymin = evals.mean - evals.sd, ymax = evals.mean + evals.sd), width = 0.1)#, position = position_dodge(1))
@@ -155,26 +158,14 @@ g = g + theme_bw()
 g = g + labs(x = expression(n), y = "Nr. of function evaluations", shape = "Additional targets", color = "Additional targets")
 g = g + theme(legend.position = "top")
 lbs = unname(TeX(c("$S = \\{\\}", "$S = \\{s_1\\}", "$S = \\{s_1, s_2\\}")))
-g = g + scale_color_brewer(palette = "Dark2", labels = lbs)
+colpalette = c("#1B9E77", "#D95F02", "#7570B3")
 g = g + scale_shape_discrete(labels = lbs)
+g = g + scale_color_manual(values = colpalette)
 br = seq(10, 100, by = 10)
 g = g + scale_x_discrete(breaks = br, labels = br)
+g = g + guides(color = FALSE, shape = guide_legend(override.aes = list(color = colpalette)))
 g
 ggsave("images/angelic_placement_plateau.pdf", plot = g, width = 5, height = 4)
 
 
-tbl.plateau = filter(tblaggr, f == "PLATEAU", ntargets >= 1)
-g = ggplot(tbl.plateau, aes(x = as.factor(n), y = evals.mean, group = as.factor(ntargets), shape = as.factor(ntargets), color = as.factor(ntargets)))
-g = g + geom_line()
-g = g + geom_point()
-g = g + geom_errorbar(aes(ymin = evals.mean - evals.sd, ymax = evals.mean + evals.sd), width = 0.1)#, position = position_dodge(1))
-g = g + theme_bw()
-g = g + labs(x = expression(n), y = "Nr. of function evaluations", shape = "Additional targets", color = "Additional targets")
-g = g + theme(legend.position = "top")
-lbs = unname(TeX(c("$S = \\{s_1\\}", "$S = \\{s_1, s_2\\}")))
-g = g + scale_color_brewer(palette = "Dark2", labels = lbs)
-g = g + scale_shape_discrete(labels = lbs)
-br = seq(10, 100, by = 10)
-g = g + scale_x_discrete(breaks = br, labels = br)
-g
-ggsave("images/angelic_placement_plateau_additional_only.pdf", plot = g, width = 5, height = 4)
+

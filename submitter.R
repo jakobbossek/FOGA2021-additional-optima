@@ -31,7 +31,7 @@ batchtools::addAlgorithm("RUNNER", fun = function(job, ...) {
 })
 
 # Files with experimental designs
-setup_files = paste0("data/study", 1:5, ".csv")
+setup_files = paste0("data/study", 1:6, ".csv")
 design = do.call(rbind, lapply(setup_files, load_study))#[1:100, ]
 
 batchtools::addExperiments(algo.designs = list(RUNNER = design), repls = 1L)
